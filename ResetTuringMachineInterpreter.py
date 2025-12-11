@@ -53,10 +53,7 @@ def populate_turing_machine(data):
         turingMachine.transitions.append(Transition(row[CURRENT_STATE_INDEX],row[INPUT_INDEX],row[NEXT_STATE_INDEX],row[REPLACEMENT_CHAR_INDEX],row[DIRECTION_INDEX]))
     return turingMachine
 
-
-#aplus with input aaa 
-#composite with input of 111111
-#one other of your choice
+#describe how each application tests the reset function
 
 goodInput = '$aaabbb_'
 badInput = '$aabbb_'
@@ -72,20 +69,29 @@ inputValue = inputStringList[headIndex]
 counter = 0
 
 while currentState not in (turingMachine.reject, turingMachine.accept):
-    print(f'step: {counter+1:02d}   state: {currentState}   string: {''.join(inputStringList[:headIndex])}\033[43m{inputValue}\033[0m{''.join(inputStringList[headIndex+1:])}')
+    print(f"step: {counter+1:02d}   "
+        f"state: {currentState:<7}   "   
+        f"string: {''.join(inputStringList[:headIndex])}"
+        f"\033[43m{inputValue}\033[0m"
+        f"{''.join(inputStringList[headIndex+1:])}")
+    
     nextState = turingMachine.getNextState(currentState, inputValue)
     replacementChar = turingMachine.getReplacementChar(currentState, inputValue)
     direction = turingMachine.getDirection(currentState, inputValue)
-    inputStringList[headIndex] = replacementChar
     
+    inputStringList[headIndex] = replacementChar
     if(direction=='R'):
         headIndex+=1
     if(direction=='L'):
         headIndex=0
-
     inputValue = inputStringList[headIndex]
     currentState = nextState
+
     counter+=1
 
-print(f'step: {counter+1:02d}   state: {currentState}   string: {''.join(inputStringList[:headIndex])}\033[43m{inputValue}\033[0m{''.join(inputStringList[headIndex+1:])}')
+print(f"step: {counter+1:02d}   "
+        f"state: {currentState:<7}   "   
+        f"string: {''.join(inputStringList[:headIndex])}"
+        f"\033[43m{inputValue}\033[0m"
+        f"{''.join(inputStringList[headIndex+1:])}")
 print(counter+1)
