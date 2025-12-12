@@ -1,4 +1,5 @@
 import csv
+import os
 
 TRANSITION_START = 7
 START_STATE_ROW = 4
@@ -26,20 +27,15 @@ class TuringMachine:
         self.accept = accept
         self.reject = reject
         self.transitions = transitions
-    def getNextState(self, currentState, inputValue):
+    def getNextStateReplacementCharDirection(self, currentState, inputValue):
         for transition in self.transitions:
             if transition.currState == currentState and transition.input == inputValue:
-                return transition.nextState
-    def getReplacementChar(self, currentState, inputValue):
-        for transition in self.transitions:
-            if transition.currState == currentState and transition.input == inputValue:
-                return transition.replacement
-    def getDirection(self, currentState, inputValue):
-        for transition in self.transitions:
-            if transition.currState == currentState and transition.input == inputValue:
-                return transition.direction
+                return {'next state': transition.nextState, 'replacement char': transition.replacement, 'direction': transition.direction}
+        return False
 
 def get_data(file):
+    if not os.path.exists(file):
+        raise FileNotFoundError(f"CSV file not found: '{file}'")
     data = []
     with open(file, "r", newline="") as f:
         reader = csv.reader(f)
@@ -53,34 +49,52 @@ def populate_turing_machine(data):
         turingMachine.transitions.append(Transition(row[CURRENT_STATE_INDEX],row[INPUT_INDEX],row[NEXT_STATE_INDEX],row[REPLACEMENT_CHAR_INDEX],row[DIRECTION_INDEX]))
     return turingMachine
 
-#describe how each application tests the reset function
+def ask_for_file():
+    while True:
+        filename = input("Enter the CSV file name: ").strip()
+        if os.path.exists(filename):
+            return filename
+        print(f"File '{filename}' does not exist. Try again.\n")
 
-goodInput = '$aaabbb_'
-badInput = '$aabbb_'
-inputString = goodInput
+def ask_for_string():
+    while True:
+        string = input("Enter a string starting with $ and ending with _: ").strip()
+        if string[0]=='$' and string[-1]=='_':
+            return string
+        print(f"String must start with '$' and end with '_'\n")
+
+
+file = ask_for_file()
+data = get_data(file)
+
+inputString = ask_for_string()
 inputStringList = list(inputString)
 
-headIndex = 0
-data = get_data("TuringMachine1.csv")
 turingMachine = populate_turing_machine(data)
 
+headIndex = 0
 currentState = turingMachine.start
 inputValue = inputStringList[headIndex]
 counter = 0
 
 while currentState not in (turingMachine.reject, turingMachine.accept):
     print(f"step: {counter+1:02d}   "
-        f"state: {currentState:<7}   "   
-        f"string: {''.join(inputStringList[:headIndex])}"
-        f"\033[43m{inputValue}\033[0m"
-        f"{''.join(inputStringList[headIndex+1:])}")
+            f"state: {currentState:<7}   "   
+            f"string: {''.join(inputStringList[:headIndex])}"
+            f"\033[43m{inputValue}\033[0m"
+            f"{''.join(inputStringList[headIndex+1:])}")
     
-    nextState = turingMachine.getNextState(currentState, inputValue)
-    replacementChar = turingMachine.getReplacementChar(currentState, inputValue)
-    direction = turingMachine.getDirection(currentState, inputValue)
-    
+    transitionResult = turingMachine.getNextStateReplacementCharDirection(currentState, inputValue)
+    if(transitionResult==False):
+        print("invalid string")
+        exit(0)
+
+    nextState, replacementChar, direction = transitionResult['next state'], transitionResult['replacement char'], transitionResult['direction']
+
     inputStringList[headIndex] = replacementChar
     if(direction=='R'):
+        if headIndex == len(inputStringList) - 1:
+            inputStringList.append('_')
         headIndex+=1
     if(direction=='L'):
         headIndex=0

@@ -1,4 +1,4 @@
-A^nB^n_reset_TM
+a^n_b^n
 q0,q1,qacc,qrej
 $,a,b
 $,a,b,X,Y,_

@@ -1,0 +1,17 @@
+Even_a
+q0,q1,q2,q3,q4,qacc,qrej
+$,a,X,_
+$,a,X,_
+q0
+qacc
+qrej
+q0,$,q0,$,R
+q0,X,q0,X,R
+q0,a,q1,X,L
+q0,_,qacc,_,L
+q1,$,q1,$,R
+q1,X,q2,X,R
+q2,X,q2,X,R
+q2,a,q3,X,L
+q2,_,qrej,_,L
+q3,$,q0,$,R
